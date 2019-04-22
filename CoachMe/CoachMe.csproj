@@ -236,6 +236,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IndustryController.cs" />
     <Compile Include="Controllers\OccupationController.cs" />
+    <Compile Include="Controllers\TAFEController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -350,7 +351,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>49828</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:49828/</IISUrl>
+          <IISUrl>http://localhost:49829/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
