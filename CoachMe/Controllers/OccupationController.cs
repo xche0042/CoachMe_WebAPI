@@ -16,12 +16,13 @@ namespace CoachMe.Controllers
         public string five_year_growth { get; set; }
         public string five_year_growth_percentage { get; set; }
         public string salary_2018 { get; set; }
+        public string has_tafe { get; set; }
         public string error { get; set; }
 
         public OccupationResult(string occupation_code, string occupation_level
             , string occupation_name, string vacancy_2018, string vacancy_2023
             , string five_year_growth, string five_year_growth_percentage
-            , string salary_2018, string error)
+            , string salary_2018, string has_tafe, string error)
         {
             this.occupation_code = occupation_code;
             this.occupation_level = occupation_level;
@@ -31,6 +32,7 @@ namespace CoachMe.Controllers
             this.five_year_growth = five_year_growth;
             this.five_year_growth_percentage = five_year_growth_percentage;
             this.salary_2018 = salary_2018;
+            this.has_tafe = has_tafe;
             this.error = error;
         }
     }
@@ -48,7 +50,8 @@ namespace CoachMe.Controllers
             MySqlCommand query = conn.CreateCommand();
             query.CommandText = "SELECT o.occupation_code, o.occupation_level, " +
                                 "o.occupation_name, oc.2018_vacancy, oc.2023_vacancy, " +
-                                "oc.five_year_growth, oc.five_year_growth_percentage, oc.2018_salary " +
+                                "oc.five_year_growth, oc.five_year_growth_percentage, " +
+                                "oc.2018_salary, o.has_tafe " +
                                 "FROM occupation o JOIN occupation_vacancy oc " +
                                 "ON o.occupation_code = oc.occupation_code " +
                                 "WHERE o.occupation_level = @occupation_level;";
@@ -66,8 +69,8 @@ namespace CoachMe.Controllers
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
             {
-                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, ex.ToString()));
-                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, "No Connection!"));
+                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, null, ex.ToString()));
+                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, null, "No Connection!"));
             }
 
             // Define the fetch query
@@ -84,6 +87,7 @@ namespace CoachMe.Controllers
                     , fetch_query["five_year_growth"].ToString()
                     , fetch_query["five_year_growth_percentage"].ToString()
                     , fetch_query["2018_salary"].ToString()
+                    , fetch_query["has_tafe"].ToString()
                     , null));
             }
 
@@ -104,7 +108,8 @@ namespace CoachMe.Controllers
             MySqlCommand query = conn.CreateCommand();
             query.CommandText = "SELECT o.occupation_code, o.occupation_level, " +
                                 "o.occupation_name, oc.2018_vacancy, oc.2023_vacancy, " +
-                                "oc.five_year_growth, oc.five_year_growth_percentage, oc.2018_salary " +
+                                "oc.five_year_growth, oc.five_year_growth_percentage, " +
+                                "oc.2018_salary, o.has_tafe " +
                                 "FROM occupation o JOIN occupation_vacancy oc " +
                                 "ON o.occupation_code = oc.occupation_code " +
                                 "WHERE o.occupation_code LIKE CONCAT(@occupation_parent, '_');";
@@ -122,8 +127,8 @@ namespace CoachMe.Controllers
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
             {
-                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, ex.ToString()));
-                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, "No Connection!"));
+                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, null, ex.ToString()));
+                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, null, "No Connection!"));
             }
 
             // Define the fetch query
@@ -140,6 +145,7 @@ namespace CoachMe.Controllers
                     , fetch_query["five_year_growth"].ToString()
                     , fetch_query["five_year_growth_percentage"].ToString()
                     , fetch_query["2018_salary"].ToString()
+                    , fetch_query["has_tafe"].ToString()
                     , null));
             }
 
