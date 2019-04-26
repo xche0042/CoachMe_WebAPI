@@ -5,6 +5,8 @@ using MySql.Data.MySqlClient;
 
 namespace CoachMe.Controllers
 {
+    // Define the Resuls class to store the value retrieved from the backend MySQL
+    // Database and return it as JSON to the frontend
     public class Results
     {
         public string suburb_name { get; set; }
@@ -26,28 +28,27 @@ namespace CoachMe.Controllers
 
     public class ValuesController : ApiController
     {
-        // GET api/values/{property_type}/{median_price}
-        public List<Results> Get(string property_type, string median_price)
+        // GET api/values/{median_price}
+        [Route("api/values/{median_price}")]
+        public List<Results> Get(string median_price)
         {
             // Create connection for MySQL database
             MySqlConnection conn = WebApiConfig.conn();
 
-            // Parse  the median_price from String to Integer
+            // Parse the median_price from String to Integer
             int median_price_double = Int32.Parse(median_price);
 
             // Define the MySQL Statement to query all the areas within the price range
             MySqlCommand query = conn.CreateCommand();
-            query.CommandText = "SELECT s.suburb_name, s.suburb_lat, s.suburb_long" +
-                ", pr.median_price, pr.rental_date, p.property_name " +
+            query.CommandText = "SELECT s.suburb_name, s.suburb_lat, s.suburb_long, " +
+                "AVG(NULLIF(pr.median_price, 0)) AS median_price " +
                 "FROM suburb s JOIN suburb_property sp ON s.suburb_id = sp.suburb_id " +
                 "JOIN property p ON p.property_id = sp.property_id " +
                 "JOIN property_rental pr ON sp.suburb_property_id = pr.suburb_property_id " +
-                "WHERE p.property_name = @property_type " +
-                "AND pr.rental_date = '20180901' " +
-                "AND pr.median_price <= @median_price AND pr.median_price > 0;";
+                "GROUP BY s.suburb_name, s.suburb_lat, s.suburb_long " +
+                "HAVING median_price <= @median_price;";
 
             // Define parameters for the MySQL Statement
-            query.Parameters.AddWithValue("@property_type", property_type);
             query.Parameters.AddWithValue("@median_price", median_price_double);
 
             // Use prefined Result class to store the values returned
@@ -80,19 +81,20 @@ namespace CoachMe.Controllers
         }
 
         // GET api/values/
+        [Route("api/values")]
         public List<Results> Get()
         {
             // Create connection for MySQL database
             MySqlConnection conn = WebApiConfig.conn();
 
-            // Define the MySQL Statement to query all the areas within the price range
+            // Define the MySQL Statement to query all the areas' average rental price
             MySqlCommand query = conn.CreateCommand();
-            query.CommandText = "SELECT s.suburb_name, s.suburb_lat, " +
-                "s.suburb_long, AVG(NULLIF(pr.median_price, 0)) AS median_price " +
+            query.CommandText = "SELECT s.suburb_name, s.suburb_lat, s.suburb_long, " +
+                "AVG(NULLIF(pr.median_price, 0)) AS median_price " +
                 "FROM suburb s JOIN suburb_property sp ON s.suburb_id = sp.suburb_id " +
                 "JOIN property p ON p.property_id = sp.property_id " +
                 "JOIN property_rental pr ON sp.suburb_property_id = pr.suburb_property_id " +
-                "GROUP BY s.suburb_name;";
+                "GROUP BY s.suburb_name, s.suburb_lat, s.suburb_long;"; 
 
             // Use prefined Result class to store the values returned
             var results = new List<Results>();
