@@ -123,6 +123,60 @@ namespace CoachMe.Controllers
             return results;
         }
 
+        // GET api/tafe
+        [Route("api/tafe")]
+        public List<TAFEResult> Get()
+        {
+            // Create connection for MySQL database
+            MySqlConnection conn = WebApiConfig.conn();
+
+            // Define the MySQL Statement to query all the tafe details under a certain occupation
+            // code (e.g. if occupation_code is 2, find all tafe courses under the code, such as
+            // 21, 22, 211 & 213)
+            MySqlCommand query = conn.CreateCommand();
+            query.CommandText = "SELECT o.occupation_code, o.occupation_level, " +
+                                "o.occupation_name, t.tafe_code, t.tafe_name, " +
+                                "t.tafe_website, oc.five_year_growth_percentage, oc.2018_salary " +
+                                "FROM occupation o JOIN tafe_occupation tao " +
+                                "ON o.occupation_code = tao.occupation_code " +
+                                "JOIN tafe t ON tao.tafe_code = t.tafe_code " +
+                                "JOIN occupation_vacancy oc ON o.occupation_code = oc.occupation_code;";
+
+            // Use prefined Result class to store the values returned
+            var results = new List<TAFEResult>();
+
+            // Error Handling 
+            try
+            {
+                conn.Open();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                results.Add(new TAFEResult(null, null, null, null, null, null, null, null, ex.ToString()));
+                results.Add(new TAFEResult(null, null, null, null, null, null, null, null, "No Connection!"));
+            }
+
+            // Define the fetch query
+            MySqlDataReader fetch_query = query.ExecuteReader();
+
+            // Parse the query result and store in the Result list
+            while (fetch_query.Read())
+            {
+                results.Add(new TAFEResult(fetch_query["occupation_code"].ToString()
+                    , fetch_query["occupation_level"].ToString()
+                    , fetch_query["occupation_name"].ToString()
+                    , fetch_query["tafe_code"].ToString()
+                    , fetch_query["tafe_name"].ToString()
+                    , fetch_query["tafe_website"].ToString()
+                    , fetch_query["five_year_growth_percentage"].ToString()
+                    , fetch_query["2018_salary"].ToString()
+                    , null));
+            }
+
+            // Return results for the GET api
+            return results;
+        }
+
         // GET api/tafe/{institute}/{tafe_code}
         [Route("api/tafe/{institute}/{tafe_code}")]
         public List<TAFEInstitute> Get(string institute, string tafe_code)
