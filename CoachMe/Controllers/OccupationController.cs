@@ -95,6 +95,58 @@ namespace CoachMe.Controllers
             return results;
         }
 
+        // GET api/occupation
+        [Route("api/occupation")]
+        public List<OccupationResult> Get()
+        {
+            // Create connection for MySQL database
+            MySqlConnection conn = WebApiConfig.conn();
+
+            // Define the MySQL Statement to query all the occupation details
+            MySqlCommand query = conn.CreateCommand();
+            query.CommandText = "SELECT o.occupation_code, o.occupation_level, " +
+                                "o.occupation_name, oc.2018_vacancy, oc.2023_vacancy, " +
+                                "oc.five_year_growth, oc.five_year_growth_percentage, " +
+                                "oc.2018_salary, o.has_tafe " +
+                                "FROM occupation o JOIN occupation_vacancy oc " +
+                                "ON o.occupation_code = oc.occupation_code;";
+
+            // Use prefined Result class to store the values returned
+            var results = new List<OccupationResult>();
+
+            // Error Handling 
+            try
+            {
+                conn.Open();
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, null, ex.ToString()));
+                results.Add(new OccupationResult(null, null, null, null, null, null, null, null, null, "No Connection!"));
+            }
+
+            // Define the fetch query
+            MySqlDataReader fetch_query = query.ExecuteReader();
+
+            // Parse the query result and store in the Result list
+            while (fetch_query.Read())
+            {
+                results.Add(new OccupationResult(fetch_query["occupation_code"].ToString()
+                    , fetch_query["occupation_level"].ToString()
+                    , fetch_query["occupation_name"].ToString()
+                    , fetch_query["2018_vacancy"].ToString()
+                    , fetch_query["2023_vacancy"].ToString()
+                    , fetch_query["five_year_growth"].ToString()
+                    , fetch_query["five_year_growth_percentage"].ToString()
+                    , fetch_query["2018_salary"].ToString()
+                    , fetch_query["has_tafe"].ToString()
+                    , null));
+            }
+
+            // Return results for the GET api
+            return results;
+        }
+
         // GET api/occupation/{occupation_level}/{occupation_parent}
         [Route("api/occupation/{occupation_level}/{occupation_parent}")]
         public List<OccupationResult> Get(string occupation_level, string occupation_parent)

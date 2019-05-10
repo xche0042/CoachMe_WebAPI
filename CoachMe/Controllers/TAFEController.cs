@@ -177,9 +177,9 @@ namespace CoachMe.Controllers
             return results;
         }
 
-        // GET api/tafe/{institute}/{tafe_code}
-        [Route("api/tafe/{institute}/{tafe_code}")]
-        public List<TAFEInstitute> Get(string institute, string tafe_code)
+        // GET api/tafe/institute/all
+        [Route("api/tafe/{institute}/{all}")]
+        public List<TAFEInstitute> Get(string institute, string all)
         {
             // Create connection for MySQL database
             MySqlConnection conn = WebApiConfig.conn();
@@ -190,11 +190,7 @@ namespace CoachMe.Controllers
                                 "i.institute_address, i.institute_lat, i.institute_long " +
                                 "FROM tafe t JOIN tafe_institute ti " +
                                 "ON t.tafe_code = ti.tafe_code " +
-                                "JOIN institute i ON ti.institute_code = i.institute_code " +
-                                "WHERE t.tafe_code = @tafe_code;";
-
-            // Define parameters for the MySQL Statement
-            query.Parameters.AddWithValue("@tafe_code", tafe_code);
+                                "JOIN institute i ON ti.institute_code = i.institute_code;";
 
             // Use prefined Result class to store the values returned
             var results = new List<TAFEInstitute>();
