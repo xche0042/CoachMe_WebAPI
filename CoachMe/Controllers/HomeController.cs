@@ -10,7 +10,7 @@ namespace CoachMe.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.Title = "Home PageH";
+            ViewBag.Title = "Home Page";
 
             return View();
         }
